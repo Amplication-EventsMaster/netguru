@@ -1,0 +1,69 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DB_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Inventory {
+  available   Boolean?
+  createdAt   DateTime @default(now())
+  id          String   @id @default(cuid())
+  name        String?
+  pricePerDay Float?
+  rentals     Rental[]
+  typeField   String?
+  updatedAt   DateTime @updatedAt
+}
+
+model Feedback {
+  comment   String?
+  createdAt DateTime @default(now())
+  id        String   @id @default(cuid())
+  order     Order?   @relation(fields: [orderId], references: [id])
+  orderId   String?
+  rating    Int?
+  updatedAt DateTime @updatedAt
+}
+
+model Customer {
+  createdAt   DateTime @default(now())
+  email       String?
+  firstName   String?
+  id          String   @id @default(cuid())
+  lastName    String?
+  phoneNumber String?
+  rentals     Rental[]
+  updatedAt   DateTime @updatedAt
+}
+
+model Rental {
+  createdAt   DateTime   @default(now())
+  customer    Customer?  @relation(fields: [customerId], references: [id])
+  customerId  String?
+  endDate     DateTime?
+  id          String     @id @default(cuid())
+  inventory   Inventory? @relation(fields: [inventoryId], references: [id])
+  inventoryId String?
+  orders      Order[]
+  startDate   DateTime?
+  totalPrice  Float?
+  updatedAt   DateTime   @updatedAt
+}
+
+model Order {
+  createdAt DateTime         @default(now())
+  feedbacks Feedback[]
+  id        String           @id @default(cuid())
+  orderDate DateTime?
+  rental    Rental?          @relation(fields: [rentalId], references: [id])
+  rentalId  String?
+  status    EnumOrderStatus?
+  updatedAt DateTime         @updatedAt
+}
+
+enum EnumOrderStatus {
+  Option1
+}
